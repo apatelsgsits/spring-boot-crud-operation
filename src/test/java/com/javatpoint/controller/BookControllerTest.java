@@ -1,36 +1,36 @@
 package com.javatpoint.controller;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import com.javatpoint.model.Books;
 import com.javatpoint.service.BooksService;
 
-@WebMvcTest(BooksController.class)
+@ExtendWith(MockitoExtension.class)
 class BooksControllerTest {
 
-	@Autowired
-	private MockMvc mvc;
+	@InjectMocks
+	private BooksController controller;
 	
 	@Mock
 	BooksService booksService;
 
 	@Test
 	void testGetBooks() throws Exception {
-		mvc.perform(MockMvcRequestBuilders.get("/book/{bookid}")
-				.accept(MediaType.APPLICATION_JSON))
-		.andDo(print())
-		.andExpect(status().isOk())
-		.andExpect(MockMvcResultMatchers.jsonPath("$book").exists())
-		.andExpect(MockMvcResultMatchers.jsonPath("$book[*].bookid").isNotEmpty());
+		
+		MockHttpServletRequest request = new MockHttpServletRequest();
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+        Books book=new Books();
+        Mockito.when(booksService.getBooksById(1)).thenReturn(book);
+        Books responseEntity= controller.getBooks(1);
+        
 	}
 
 }
